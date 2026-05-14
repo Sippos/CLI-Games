@@ -1,0 +1,12 @@
+const readline = require("readline")
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+
+rl.question("Choose rock, paper or scissor: ", (answer) => {
+    console.log(`You chose ${answer}`);
+
+    rl.close();
+})
