@@ -5,10 +5,14 @@
 //   node rockPaperScissors.js rock 
 //   # Output: You chose rock. Computer chose scissors. You win!
 
-const playerInput = process.argv[2].toLowerCase()
+const playerInput = process.argv[2]?.toLowerCase()
 const moves = ["rock", "paper", "scissor"]
 const computerOutput = moves[Math.floor(Math.random() * moves.length)]
 
+if (!moves.includes(playerInput)) {
+  console.log("Please choose rock, paper, or scissor.");
+  process.exit()
+}
 
 console.log(`You chose ${playerInput}.`)
 console.log(`Computer chose ${computerOutput}.`)
