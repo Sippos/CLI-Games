@@ -14,25 +14,25 @@
 //   # Output: You chose rock. Computer chose scissors. You win!
 
 const playerInput = process.argv[2].toLowerCase()
-const playerMoves = ["rock", "paper", "scissor"]
-const computerMoves = playerMoves[Math.floor(Math.random() * playerMoves.length)]
+const moves = ["rock", "paper", "scissor"]
+const computerOutput = moves[Math.floor(Math.random() * moves.length)]
 
 
 console.log(`You chose ${playerInput}.`)
-console.log(`Computer chose ${computerMoves}.`)
+console.log(`Computer chose ${computerOutput}.`)
 
-if(playerInput === computerMoves) {
+if(playerInput === computerOutput) {
     console.log(`It is a draw!`)
-} else if (playerInput === "rock" & computerMoves === `scissor`) {
+} else if (playerInput === "rock" && computerOutput === `scissor`) {
     console.log(`You win.`)
-} else if (playerInput === "rock" & computerMoves === `paper`) {
+} else if (playerInput === "rock" && computerOutput === `paper`) {
     console.log(`You loose.`)
-} else if (playerInput === "paper" & computerMoves === `scissor`) {
+} else if (playerInput === "paper" && computerOutput === `scissor`) {
     console.log(`Computer wins.`)
-} else if (playerInput === "paper" & computerMoves === `rock`) {
+} else if (playerInput === "paper" && computerOutput === `rock`) {
     console.log(`You win.`)
-} else if (playerInput === "scissor" & computerMoves === `rock`) {
+} else if (playerInput === "scissor" && computerOutput === `rock`) {
     console.log(`Computer wins.`)
-} else if (playerInput === "scissor" & computerMoves === `paper`) {
+} else if (playerInput === "scissor" && computerOutput === `paper`) {
     console.log(`You win.`)
 }
