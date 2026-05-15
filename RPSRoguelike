@@ -1,6 +1,8 @@
 let playerHP = 10;
+let playerMaxHP = 10;
 let enemyHP = 6;
-const damage = 2;
+let damage = 2;
+let enemyLevel = 1;
 const moves = ["rock", "paper", "scissor"];
 
 const readline = require("readline")
@@ -26,20 +28,20 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
     console.log(`Enemy chose ${enemyMove}`);
     
     if (playerMove === enemyMove) {
-        console.log("Draw!");
+        console.log("\x1b[33mDraw!\x1b[0m");
     } else if (
         (playerMove === "rock" && enemyMove === "scissor") ||
         (playerMove === "paper" && enemyMove === "rock") ||
         (playerMove === "scissor" && enemyMove === "paper")
     ) {
         enemyHP -= damage;
-        console.log("You hit the enemy!");
+        console.log("\x1b[32mYou hit the enemy!\x1b[0m");
     }   else {
         playerHP -= damage;
-        console.log("The enemy hits you!")
+        console.log("\x1b[31mThe enemy hits you!\x1b[0m");
     }
     
-    console.log(`Player HP: ${playerHP}`);
+    console.log("\x1b[36mPlayer HP: 10\x1b[0m");
     console.log(`Enemy HP: ${enemyHP}`);
 
     if (playerHP <= 0) {
@@ -47,11 +49,46 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
         rl.close();
     }   else if (enemyHP <= 0) {
         console.log("You defeated the enemy!");
-        rl.close();
+        chooseUpgrade();
     }   else {
         playRound();
     }
 });
 }
 
+function chooseUpgrade() {
+    console.log("Choose an upgrade.");
+    console.log("1. +2 Max HP");
+    console.log("2. +1 Damage");
+    console.log("3. Heal 4 HP");
+
+    rl.question("Pick 1, 2 or 3: ", (choice) => {
+        if (choice === "1") {
+            playerMaxHP += 2;
+            playerHP += 2;
+            console.log("Your max HP increased!");
+        } else if (choice === "2") {
+            damage += 1;
+            console.log("Your damage increased!");
+        } else if (choice === "3") {
+            playerHP += 4;
+            if (playerHP > playerMaxHP) {
+                playerHP = playerMaxHP;
+            }
+            console.log("You healed!");
+        } else {
+            console.log("Invalid choice.");
+            chooseUpgrade();
+            return;
+        }
+        startNextFight();
+    });
+}
+
 playRound();
+
+function startNextFight() {
+    enemyHP = 6;
+    console.log("A new enemy appears!");
+    playRound();
+}
