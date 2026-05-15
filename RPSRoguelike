@@ -11,6 +11,7 @@ const rl = readline.createInterface({
     output: process.stdout
 })
 
+function playRound() {
 rl.question("Choose rock, paper or scissor: ", (answer) => {
     const playerMove = answer.toLowerCase();
     const enemyMove = moves[Math.floor(Math.random() * moves.length)]
@@ -40,5 +41,17 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
     
     console.log(`Player HP: ${playerHP}`);
     console.log(`Enemy HP: ${enemyHP}`);
-    rl.close();
-})
+
+    if (playerHP <= 0) {
+        console.log("Game over! You died.");
+        rl.close();
+    }   else if (enemyHP <= 0) {
+        console.log("You defeated the enemy!");
+        rl.close();
+    }   else {
+        playRound();
+    }
+});
+}
+
+playRound();
