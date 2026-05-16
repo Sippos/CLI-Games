@@ -4,6 +4,7 @@ let enemyHP = 6;
 let damage = 2;
 let enemyLevel = 1;
 let lastMessage = "A wild enemy appears!";
+let currentPath = "normal";
 const moves = ["rock", "paper", "scissor"];
 
 const readline = require("readline")
@@ -62,47 +63,94 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
         rl.close();
     }   else if (enemyHP <= 0) {
         console.log("You defeated the enemy!");
-        chooseUpgrade();
+        chooseUpgrade(currentPath);
     }   else {
         playRound();
     }
 });
 }
 
-function chooseUpgrade() {
+function chooseUpgrade(path) {
     console.log("\x1b[35m\nChoose your upgrade:\x1b[0m");
-    console.log("\x1b[32m1. +2 Max HP\x1b[0m");
-    console.log("\x1b[31m2. +1 Damage\x1b[0m");
-    console.log("\x1b[36m3. Heal 4 HP\x1b[0m");
+
+    if (path === "elite") {
+        console.log("\x1b[31mELITE REWARD!\x1b[0m");
+        console.log("1. +4 Max HP");
+        console.log("2. +2 Damage");
+        console.log("3. Full Heal");
+    } else {
+        console.log("1. +2 Max HP");
+        console.log("2. +1 Damage");
+        console.log("3. Heal 4 HP");
+    }
 
     rl.question("Pick 1, 2 or 3: ", (choice) => {
-        if (choice === "1") {
-            playerMaxHP += 2;
-            playerHP += 2;
-            console.log("Your max HP increased!");
-        } else if (choice === "2") {
-            damage += 1;
-            console.log("Your damage increased!");
-        } else if (choice === "3") {
-            playerHP += 4;
-            if (playerHP > playerMaxHP) {
+        if (path === "elite") {
+            if (choice === "1") {
+                playerMaxHP += 4;
+                playerHP += 4;
+            } else if (choice === "2") {
+                damage += 2;
+            } else if (choice === "3") {
                 playerHP = playerMaxHP;
             }
-            console.log("You healed!");
         } else {
-            console.log("Invalid choice.");
-            chooseUpgrade();
-            return;
+            if (choice === "1") {
+                playerMaxHP += 2;
+                playerHP += 2;
+            } else if (choice === "2") {
+                damage += 1;
+            } else if (choice === "3") {
+                playerHP += 4;
+                if (playerHP > playerMaxHP) playerHP = playerMaxHP;
+            }
         }
-        startNextFight();
+
+        choosePath();
     });
 }
 
 playRound();
 
-function startNextFight() {
+function choosePath() {
+    console.clear();
+
+    console.log("\x1b[35m========= CHOOSE YOUR PATH =========\x1b[0m\n");
+
+    console.log("                 YOU");
+    console.log("                  │");
+    console.log("        ┌─────────┴─────────┐");
+    console.log("        │                   │");
+    console.log("        ▼                   ▼");
+    console.log("  [1] Graveyard       [2] Blood Moon");
+    console.log("  Normal fight        Elite fight");
+    console.log("  Normal upgrade      Rare upgrade\n");
+
+    rl.question("Choose path 1 or 2: ", (choice) => {
+        if (choice === "1") {
+            currentPath = "normal";
+            lastMessage = "You enter the Graveyard...";
+            startNextFight("normal");
+        } else if (choice === "2") {
+            currentPath = "elite";
+            lastMessage = "You walk under the Blood Moon...";
+            startNextFight("elite");
+        } else {
+            choosePath();
+        }
+    });
+}
+
+function startNextFight(type) {
     enemyLevel++;
-    enemyHP = 6 + enemyLevel * 2;
-    console.log(`\n\x1b[35m--- Enemy Level ${enemyLevel} appears! ---\x1b[0m`);
+
+    if (type === "elite") {
+        enemyHP = 10 + enemyLevel * 3;
+        lastMessage = `An elite enemy appears!`;
+    } else {
+        enemyHP = 6 + enemyLevel * 2;
+        lastMessage = `Enemy Level ${enemyLevel} appears!`;
+    }
+
     playRound();
 }
