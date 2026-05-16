@@ -6,6 +6,36 @@ let enemyLevel = 1;
 let lastMessage = "A wild enemy appears!";
 let currentPath = "normal";
 const moves = ["rock", "paper", "scissor"];
+let paperHeal = 0;
+let scissorPoison = 0;
+let rockBonusDamage = 0;
+let totalDamage = damage;
+const upgrades = [
+    {
+        name: "Stone Fist",
+        weapon: "Rock",
+        description: "+2 damage. Rock becomes a heavy hitter.",
+        apply: () => {
+            damage += 2;
+        }
+    },
+    {
+        name: "Paper Charm",
+        weapon: "Paper",
+        description: "Paper heals you for 2 HP when you win with it.",
+        apply: () => {
+            paperHeal += 2;
+        }
+    },
+    {
+        name: "Poison Scissors",
+        weapon: "Scissor",
+        description: "Scissor applies poison after a hit.",
+        apply: () => {
+            scissorPoison += 1;
+        }
+    }
+];
 
 const readline = require("readline")
 
@@ -26,14 +56,25 @@ function showScreen() {
     console.log(`\x1b[31mEnemy HP: ${enemyHP}\x1b[0m`);
     console.log(`\x1b[33mDamage: ${damage}\x1b[0m\n`);
 
+    console.log(`🪨 : +${rockBonusDamage}`);
+    console.log(`📜 : +${paperHeal}`);
+    console.log(`✂️ : +${scissorPoison}\n`);
+
     console.log(`\x1b[37m${lastMessage}\x1b[0m\n`);
+}
+
+function getMoveIcon(move) {
+    if (move === "rock") return "🪨";
+    if (move === "paper") return "📜";
+    if (move === "scissor") return "✂️";
 }
 
 function playRound() {
     showScreen();
-rl.question("Choose rock, paper or scissor: ", (answer) => {
+rl.question("Choose rock 🪨, paper 📜 or scissor ✂️ : ", (answer) => {
     const playerMove = answer.toLowerCase();
     const enemyMove = moves[Math.floor(Math.random() * moves.length)]
+    const fightText = `${getMoveIcon(playerMove)}  VS ${getMoveIcon(enemyMove)}`;
     
     if (!moves.includes(playerMove)) {
         console.log("Please choose rock, paper or scissor.");
@@ -41,19 +82,39 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
         return;
     }
     
-    if (playerMove === enemyMove) {
-        lastMessage = `You chose ${playerMove}. Enemy chose ${enemyMove}. \x1b[33mDraw!\x1b[0m`;
-    } else if (
-        (playerMove === "rock" && enemyMove === "scissor") ||
-        (playerMove === "paper" && enemyMove === "rock") ||
-        (playerMove === "scissor" && enemyMove === "paper")
-    ) {
-        enemyHP -= damage;
-        lastMessage = `You chose ${playerMove}. Enemy chose ${enemyMove}. \x1b[32mYou hit the enemy!\x1b[0m`;
-    }   else {
-        playerHP -= damage;
-        lastMessage = `You chose ${playerMove}. Enemy chose ${enemyMove}. \x1b[31mThe enemy hits you!\x1b[0m`;
+if (playerMove === enemyMove) {
+    lastMessage = `${fightText}\n\x1b[33mDraw!\x1b[0m`;
+} else if (
+    (playerMove === "rock" && enemyMove === "scissor") ||
+    (playerMove === "paper" && enemyMove === "rock") ||
+    (playerMove === "scissor" && enemyMove === "paper")
+) {
+    if (playerMove === "rock") {
+    totalDamage += rockBonusDamage;
+}
+
+enemyHP -= totalDamage;
+
+lastMessage = `${fightText}\n\x1b[32mYou hit the enemy for ${totalDamage} damage!\x1b[0m`;
+
+if (playerMove === "paper" && paperHeal > 0) {
+    playerHP += paperHeal;
+
+    if (playerHP > playerMaxHP) {
+        playerHP = playerMaxHP;
     }
+
+    lastMessage += `\n📜 You healed ${paperHeal} HP!`;
+}
+
+if (playerMove === "scissor" && scissorPoison > 0) {
+    enemyHP -= scissorPoison;
+    lastMessage += `\n✂️ Poison deals ${scissorPoison} extra damage!`;
+}
+} else {
+    playerHP -= damage;
+    lastMessage = `${fightText}\n\x1b[31mThe enemy hits you!\x1b[0m`;
+}
     
     console.log(`\x1b[36mPlayer HP: ${playerHP}\x1b[0m`);
     console.log(`Enemy HP: ${enemyHP}`);
@@ -71,39 +132,36 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
 }
 
 function chooseUpgrade(path) {
-    console.log("\x1b[35m\nChoose your upgrade:\x1b[0m");
+    console.clear();
 
-    if (path === "elite") {
-        console.log("\x1b[31mELITE REWARD!\x1b[0m");
-        console.log("1. +4 Max HP");
-        console.log("2. +2 Damage");
-        console.log("3. Full Heal");
-    } else {
-        console.log("1. +2 Max HP");
-        console.log("2. +1 Damage");
-        console.log("3. Heal 4 HP");
-    }
+    console.log("\x1b[35m====================================\x1b[0m");
+    console.log("\x1b[33m             LEVEL UP!               \x1b[0m");
+    console.log("\x1b[35m====================================\x1b[0m\n");
 
-    rl.question("Pick 1, 2 or 3: ", (choice) => {
-        if (path === "elite") {
-            if (choice === "1") {
-                playerMaxHP += 4;
-                playerHP += 4;
-            } else if (choice === "2") {
-                damage += 2;
-            } else if (choice === "3") {
-                playerHP = playerMaxHP;
-            }
+    console.log("\x1b[36mChoose one upgrade:\x1b[0m\n");
+
+    console.log("\x1b[37m[1] 🪨  Stone Fist\x1b[0m");
+    console.log("    Rock: +2 bonus damage\n");
+
+    console.log("\x1b[37m[2] 📜  Paper Charm\x1b[0m");
+    console.log("    Paper: Heal +2 when you win with paper\n");
+
+    console.log("\x1b[37m[3] ✂️  Poison Scissors\x1b[0m");
+    console.log("    Scissor: Adds poison damage\n");
+
+    rl.question("Pick your upgrade: ", (choice) => {
+        if (choice === "1") {
+            rockBonusDamage += 2;
+            lastMessage = "Rock upgrade gained: Stone Fist!";
+        } else if (choice === "2") {
+            paperHeal += 2;
+            lastMessage = "Paper upgrade gained: Paper Charm!";
+        } else if (choice === "3") {
+            scissorPoison += 1;
+            lastMessage = "Scissor upgrade gained: Poison Scissors!";
         } else {
-            if (choice === "1") {
-                playerMaxHP += 2;
-                playerHP += 2;
-            } else if (choice === "2") {
-                damage += 1;
-            } else if (choice === "3") {
-                playerHP += 4;
-                if (playerHP > playerMaxHP) playerHP = playerMaxHP;
-            }
+            chooseUpgrade(path);
+            return;
         }
 
         choosePath();
