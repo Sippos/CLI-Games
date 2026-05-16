@@ -20,7 +20,7 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
     
     if (!moves.includes(playerMove)) {
         console.log("Please choose rock, paper or scissor.");
-        rl.close();
+        playRound();
         return;
     }
     
@@ -41,7 +41,7 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
         console.log("\x1b[31mThe enemy hits you!\x1b[0m");
     }
     
-    console.log("\x1b[36mPlayer HP: 10\x1b[0m");
+    console.log(`\x1b[36mPlayer HP: ${playerHP}\x1b[0m`);
     console.log(`Enemy HP: ${enemyHP}`);
 
     if (playerHP <= 0) {
@@ -57,10 +57,10 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
 }
 
 function chooseUpgrade() {
-    console.log("Choose an upgrade.");
-    console.log("1. +2 Max HP");
-    console.log("2. +1 Damage");
-    console.log("3. Heal 4 HP");
+    console.log("\x1b[35m\nChoose your upgrade:\x1b[0m");
+    console.log("\x1b[32m1. +2 Max HP\x1b[0m");
+    console.log("\x1b[31m2. +1 Damage\x1b[0m");
+    console.log("\x1b[36m3. Heal 4 HP\x1b[0m");
 
     rl.question("Pick 1, 2 or 3: ", (choice) => {
         if (choice === "1") {
@@ -88,7 +88,8 @@ function chooseUpgrade() {
 playRound();
 
 function startNextFight() {
-    enemyHP = 6;
-    console.log("A new enemy appears!");
+    enemyLevel++;
+    enemyHP = 6 + enemyLevel * 2;
+    console.log(`\n\x1b[35m--- Enemy Level ${enemyLevel} appears! ---\x1b[0m`);
     playRound();
 }
