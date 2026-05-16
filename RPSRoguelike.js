@@ -3,6 +3,7 @@ let playerMaxHP = 10;
 let enemyHP = 6;
 let damage = 2;
 let enemyLevel = 1;
+let lastMessage = "A wild enemy appears!";
 const moves = ["rock", "paper", "scissor"];
 
 const readline = require("readline")
@@ -13,7 +14,22 @@ const rl = readline.createInterface({
     output: process.stdout
 })
 
+function showScreen() {
+    console.clear();
+
+    console.log("\x1b[35m==============================\x1b[0m");
+    console.log("\x1b[33m     RPS ROGUELIKE              \x1b[0m");
+    console.log("\x1b[35m==============================\x1b[0m\n");
+
+    console.log(`\x1b[36mPlayer HP: ${playerHP}\x1b[0m`);
+    console.log(`\x1b[31mEnemy HP: ${enemyHP}\x1b[0m`);
+    console.log(`\x1b[33mDamage: ${damage}\x1b[0m\n`);
+
+    console.log(`\x1b[37m${lastMessage}\x1b[0m\n`);
+}
+
 function playRound() {
+    showScreen();
 rl.question("Choose rock, paper or scissor: ", (answer) => {
     const playerMove = answer.toLowerCase();
     const enemyMove = moves[Math.floor(Math.random() * moves.length)]
@@ -24,21 +40,18 @@ rl.question("Choose rock, paper or scissor: ", (answer) => {
         return;
     }
     
-    console.log(`You chose ${playerMove}`);
-    console.log(`Enemy chose ${enemyMove}`);
-    
     if (playerMove === enemyMove) {
-        console.log("\x1b[33mDraw!\x1b[0m");
+        lastMessage = `You chose ${playerMove}. Enemy chose ${enemyMove}. \x1b[33mDraw!\x1b[0m`;
     } else if (
         (playerMove === "rock" && enemyMove === "scissor") ||
         (playerMove === "paper" && enemyMove === "rock") ||
         (playerMove === "scissor" && enemyMove === "paper")
     ) {
         enemyHP -= damage;
-        console.log("\x1b[32mYou hit the enemy!\x1b[0m");
+        lastMessage = `You chose ${playerMove}. Enemy chose ${enemyMove}. \x1b[32mYou hit the enemy!\x1b[0m`;
     }   else {
         playerHP -= damage;
-        console.log("\x1b[31mThe enemy hits you!\x1b[0m");
+        lastMessage = `You chose ${playerMove}. Enemy chose ${enemyMove}. \x1b[31mThe enemy hits you!\x1b[0m`;
     }
     
     console.log(`\x1b[36mPlayer HP: ${playerHP}\x1b[0m`);
