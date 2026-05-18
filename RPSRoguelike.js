@@ -1,44 +1,22 @@
+const readline = require("readline")
+
 let playerHP = 10;
 let playerMaxHP = 10;
+
 let enemyHP = 6;
-let damage = 2;
 let enemyLevel = 1;
+
+let damage = 2;
 let lastMessage = "A wild enemy appears!";
 let currentPath = "normal";
-const moves = ["rock", "paper", "scissor"];
+
 let paperHeal = 0;
 let scissorPoison = 0;
 let rockBonusDamage = 0;
+
 let totalDamage = damage;
-const upgrades = [
-    {
-        name: "Stone Fist",
-        weapon: "Rock",
-        description: "+2 damage. Rock becomes a heavy hitter.",
-        apply: () => {
-            damage += 2;
-        }
-    },
-    {
-        name: "Paper Charm",
-        weapon: "Paper",
-        description: "Paper heals you for 2 HP when you win with it.",
-        apply: () => {
-            paperHeal += 2;
-        }
-    },
-    {
-        name: "Poison Scissors",
-        weapon: "Scissor",
-        description: "Scissor applies poison after a hit.",
-        apply: () => {
-            scissorPoison += 1;
-        }
-    }
-];
 
-const readline = require("readline")
-
+const moves = ["rock", "paper", "scissor"];
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -69,68 +47,109 @@ function getMoveIcon(move) {
     if (move === "scissor") return "✂️";
 }
 
-function playRound() {
-    showScreen();
-rl.question("Choose rock 🪨, paper 📜 or scissor ✂️ : ", (answer) => {
-    const playerMove = answer.toLowerCase();
-    const enemyMove = moves[Math.floor(Math.random() * moves.length)]
-    const fightText = `${getMoveIcon(playerMove)}  VS ${getMoveIcon(enemyMove)}`;
-    
-    if (!moves.includes(playerMove)) {
-        console.log("Please choose rock, paper or scissor.");
-        playRound();
-        return;
-    }
-    
-if (playerMove === enemyMove) {
-    lastMessage = `${fightText}\n\x1b[33mDraw!\x1b[0m`;
-} else if (
-    (playerMove === "rock" && enemyMove === "scissor") ||
-    (playerMove === "paper" && enemyMove === "rock") ||
-    (playerMove === "scissor" && enemyMove === "paper")
-) {
-    if (playerMove === "rock") {
-    totalDamage += rockBonusDamage;
+function isValidMove(move) {
+    return moves.includes(move);
 }
 
-enemyHP -= totalDamage;
+function didPlayerWin(playerMove, enemyMove) {
+    return (
+         (playerMove === "rock" && enemyMove === "scissor") ||
+         (playerMove === "paper" && enemyMove === "rock") ||
+         (playerMove === "scissor" && enemyMove === "paper")
+    );
+}
 
-lastMessage = `${fightText}\n\x1b[32mYou hit the enemy for ${totalDamage} damage!\x1b[0m`;
+function getPlayerDamage(playerMove) {
+    let roundDamage = damage;
 
-if (playerMove === "paper" && paperHeal > 0) {
-    playerHP += paperHeal;
+    if (playerMove === "rock") {
+        roundDamage += rockBonusDamage;
+    }
+
+    return roundDamage;
+}
+
+function healPlayer(amount) {
+    playerHP += amount;
 
     if (playerHP > playerMaxHP) {
         playerHP = playerMaxHP;
     }
-
-    lastMessage += `\n📜 You healed ${paperHeal} HP!`;
 }
 
-if (playerMove === "scissor" && scissorPoison > 0) {
-    enemyHP -= scissorPoison;
-    lastMessage += `\n✂️ Poison deals ${scissorPoison} extra damage!`;
+function applyWinEffects(playerMove) {
+    const roundDamage = getPlayerDamage(playerMove);
+
+    enemyHP -= roundDamage;
+    lastMessage += `\n\x1b[32mYou hit the enemy for ${roundDamage} damage!\x1b[0m`;
+
+    if (playerMove === "paper" && paperHeal > 0) {
+        healPlayer(paperHeal);
+        lastMessage += `\n📜 You healed ${paperHeal} HP!`;
+    }
+
+    if (playerMove === "scissor" && scissorPoison > 0) {
+        enemyHP -= scissorPoison;
+        lastMessage += `\n✂️ Poison deals ${scissorPoison} extra damage!`;
+    }
 }
-} else {
+
+function handleRoundResult(playerMove, enemyMove) {
+    const fightText = `${getMoveIcon(playerMove)}  VS  ${getMoveIcon(enemyMove)}`;
+
+    if (playerMove === enemyMove) {
+        lastMessage = `${fightText}\n\x1b[33mDraw!\x1b[0m`;
+        return;
+    }
+
+    if (didPlayerWin(playerMove, enemyMove)){
+        lastMessage = fightText;
+        applyWinEffects(playerMove);
+        return;
+    }
+
     playerHP -= damage;
-    lastMessage = `${fightText}\n\x1b[31mThe enemy hits you!\x1b[0m`;
+    lastMessage = `${fightText}\n\x1b[31mThe enemy hits you for ${damage} damage!\x1b[0m`;
 }
-    
-    console.log(`\x1b[36mPlayer HP: ${playerHP}\x1b[0m`);
-    console.log(`Enemy HP: ${enemyHP}`);
 
+function checkBattleEnd() {
     if (playerHP <= 0) {
         console.log("Game over! You died.");
         rl.close();
-    }   else if (enemyHP <= 0) {
-        console.log("You defeated the enemy!");
-        chooseUpgrade(currentPath);
-    }   else {
-        playRound();
+        return true;
     }
-});
+
+    if (enemyHP <= 0) {
+        console.log("You defeated the enemy!");
+        chooseUpgrade();
+        return true;
+    }
+
+    return false;
 }
 
+function playRound() {
+    showScreen();
+
+    rl.question("Choose rock 🪨, paper 📜 or scissor ✂️ : ", (answer) => {
+        const playerMove = answer.toLowerCase();
+
+        if(!isValidMove(playerMove)) {
+            lastMessage = "Please choose rock, paper or scissor.";
+            playRound();
+            return;
+        }
+
+        const enemyMove = moves[Math.floor(Math.random() * moves.length)]
+
+        handleRoundResult(playerMove, enemyMove);
+
+        if (!checkBattleEnd()) {
+            playRound();
+        }
+    });
+}
+    
 function chooseUpgrade(path) {
     console.clear();
 
@@ -167,8 +186,6 @@ function chooseUpgrade(path) {
         choosePath();
     });
 }
-
-playRound();
 
 function choosePath() {
     console.clear();
@@ -212,3 +229,5 @@ function startNextFight(type) {
 
     playRound();
 }
+
+playRound();
