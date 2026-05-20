@@ -8,8 +8,10 @@ const secondLetter = playerInput[1]
 
 if (consonants.includes(firstLetter.toLowerCase()) && vowels.includes(secondLetter.toLowerCase())) {
     playerInput = playerInput.slice(1) + firstLetter + "ay"
+} else if (consonants.includes(firstLetter.toLowerCase()) && consonants.includes(secondLetter.toLowerCase())) {
+    playerInput = playerInput.slice(2) + firstLetter + secondLetter + "ay"
+} else if (vowels.includes(firstLetter.toLowerCase())) {
+    playerInput = playerInput + "way"
 }
-
-
 
 console.log(playerInput)
