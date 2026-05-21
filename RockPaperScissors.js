@@ -1,16 +1,16 @@
 // Rock Paper Scissors
 
-// Example:
+// How to play:
 
-//   node rockPaperScissors.js rock 
+//   node RockPaperScissors rock 
 //   # Output: You chose rock. Computer chose scissors. You win!
 
 const playerInput = process.argv[2]?.toLowerCase()
-const moves = ["rock", "paper", "scissor"]
+const moves = ["rock", "paper", "scissors"]
 const computerOutput = moves[Math.floor(Math.random() * moves.length)]
 
 if (!moves.includes(playerInput)) {
-  console.log("Please choose rock, paper, or scissor.");
+  console.log("Please choose rock, paper, or scissors.");
   process.exit()
 }
 
@@ -20,9 +20,9 @@ console.log(`Computer chose ${computerOutput}.`)
 if(playerInput === computerOutput) {
     console.log(`It is a draw!`)
 } else if (
-    (playerInput === "rock" && computerOutput === `scissor`) ||
+    (playerInput === "rock" && computerOutput === `scissors`) ||
     (playerInput === "paper" && computerOutput === `rock`) ||
-    (playerInput === "scissor" && computerOutput === `paper`)
+    (playerInput === "scissors" && computerOutput === `paper`)
 ) {
     console.log(`You win!`)
 } else {
